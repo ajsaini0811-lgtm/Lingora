@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
-import { getCompletedLessons } from "@/lib/storage";
+import { getCompletedLessons, getUser } from "@/lib/storage";
 
 interface Lesson { id: string; title: string; type: string; order: number; xpReward: number; }
 interface Unit { id: string; title: string; description: string; order: number; lessons: Lesson[]; }
@@ -31,7 +31,22 @@ export default function LearnLanguagePage() {
       if (Array.isArray(data)) setUnits(data);
       setLoading(false);
     });
-    setCompleted(getCompletedLessons());
+
+    const u = getUser();
+    if (u) {
+      fetch(`/api/users/${u.id}/progress`)
+        .then(r => r.json())
+        .then((data: any[]) => {
+          if (Array.isArray(data)) {
+            setCompleted(data.map((p: any) => p.lessonId));
+          }
+        })
+        .catch(() => {
+          setCompleted(getCompletedLessons());
+        });
+    } else {
+      setCompleted(getCompletedLessons());
+    }
   }, [lang]);
 
   if (loading) return (

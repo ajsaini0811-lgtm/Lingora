@@ -38,6 +38,25 @@ model Lesson {
   xpReward  Int        @default(10)
   unit      Unit       @relation(fields: [unitId], references: [id])
   exercises Exercise[]
+  progress  Progress[]
+}
+
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  createdAt DateTime   @default(now())
+  progress  Progress[]
+}
+
+model Progress {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  score       Int      @default(0)
+  completedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson   @relation(fields: [lessonId], references: [id])
+  @@unique([userId, lessonId])
 }
 
 model Exercise {

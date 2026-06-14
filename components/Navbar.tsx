@@ -1,6 +1,15 @@
+"use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getUser } from "@/lib/storage";
 
 export default function Navbar() {
+  const [user, setUser] = useState<{ id: string; name: string } | null>(null);
+
+  useEffect(() => {
+    setUser(getUser());
+  }, []);
+
   return (
     <nav className="bg-white border-b px-6 py-4 flex items-center justify-between sticky top-0 z-50">
       <Link href="/dashboard" className="flex items-center gap-2">
@@ -11,6 +20,11 @@ export default function Navbar() {
         <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Learn</Link>
         <Link href="/flashcards" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Flashcards</Link>
         <Link href="/progress" className="text-gray-600 hover:text-gray-900 text-sm font-medium">Progress</Link>
+        {user && (
+          <div className="flex items-center gap-2 bg-indigo-50 px-3 py-1.5 rounded-full">
+            <span className="text-sm font-medium text-indigo-700">👤 {user.name}</span>
+          </div>
+        )}
       </div>
     </nav>
   );

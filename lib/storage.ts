@@ -70,3 +70,17 @@ export function markLessonCompleted(lessonId: string): void {
     localStorage.setItem(DONE_KEY, JSON.stringify([...done, lessonId]));
   }
 }
+
+export interface LocalUser { id: string; name: string; }
+const USER_KEY = "lingora_user";
+export function getUser(): LocalUser | null {
+  if (typeof window === "undefined") return null;
+  try { return JSON.parse(localStorage.getItem(USER_KEY) ?? "null"); }
+  catch { return null; }
+}
+export function setUser(user: LocalUser): void {
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+export function clearUser(): void {
+  localStorage.removeItem(USER_KEY);
+}

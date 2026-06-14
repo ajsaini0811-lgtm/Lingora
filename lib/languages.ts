@@ -29,6 +29,9 @@ export const LANGUAGES = [
   { code: "ta", name: "Tamil", nativeName: "தமிழ்", flag: "🇮🇳", hasScript: true, scriptName: "Tamil Script", color: "#8b5cf6" },
   { code: "bn", name: "Bengali", nativeName: "বাংলা", flag: "🇧🇩", hasScript: true, scriptName: "Bengali Script", color: "#22c55e" },
   { code: "ms", name: "Malay", nativeName: "Bahasa Melayu", flag: "🇲🇾", hasScript: false, color: "#ef4444" },
+  { code: "te", name: "Telugu", nativeName: "తెలుగు", flag: "🇮🇳", hasScript: true, scriptName: "Telugu Script", color: "#8b5cf6" },
+  { code: "kn", name: "Kannada", nativeName: "ಕನ್ನಡ", flag: "🇮🇳", hasScript: true, scriptName: "Kannada Script", color: "#f97316" },
+  { code: "ml", name: "Malayalam", nativeName: "മലയാളം", flag: "🇮🇳", hasScript: true, scriptName: "Malayalam Script", color: "#10b981" },
 ];
 
 export const HIRAGANA_DATA = [

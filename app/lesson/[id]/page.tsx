@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import TTSButton from "@/components/TTSButton";
 import Link from "next/link";
-import { markLessonCompleted } from "@/lib/storage";
+import { markLessonCompleted, getUser } from "@/lib/storage";
 
 interface Exercise {
   id: string; type: string; order: number;
@@ -60,10 +60,23 @@ export default function LessonPage() {
     if (isCorrect) setScore(s => s + 1);
   }, [current, answerState, selected, inputVal]);
 
-  const nextExercise = useCallback(() => {
+  const nextExercise = useCallback(async () => {
     if (!lesson) return;
     if (currentIdx + 1 >= lesson.exercises.length) {
+      const finalScore = score + (answerState === "correct" ? 1 : 0);
       markLessonCompleted(lessonId);
+      const u = getUser();
+      if (u) {
+        try {
+          await fetch(`/api/lessons/${lessonId}/complete`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: u.id, score: finalScore }),
+          });
+        } catch {
+          // server save failed, localStorage fallback already done
+        }
+      }
       setCompleted(true);
     } else {
       setCurrentIdx(i => i + 1);

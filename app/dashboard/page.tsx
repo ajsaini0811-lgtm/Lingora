@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
+import NameModal from "@/components/NameModal";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
+import { getUser } from "@/lib/storage";
 
 interface Language {
   id: string; code: string; name: string; nativeName: string; flag: string;
@@ -13,12 +15,23 @@ export default function DashboardPage() {
   const [languages, setLanguages] = useState<Language[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<{ id: string; name: string } | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
+    const u = getUser();
+    if (!u) setShowModal(true);
+    else setUser(u);
+
     fetch("/api/languages")
       .then(r => r.json())
       .then(data => { setLanguages(data); setLoading(false); });
   }, []);
+
+  const handleNameSet = (u: { id: string; name: string }) => {
+    setUser(u);
+    setShowModal(false);
+  };
 
   const filtered = languages.filter(l =>
     l.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -27,11 +40,14 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {showModal && <NameModal onComplete={handleNameSet} />}
       <Navbar />
       <main className="max-w-5xl mx-auto px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">What do you want to learn? 🌍</h1>
-          <p className="text-gray-600 mt-1">Pick a language and start right away — no account needed.</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {user ? `Welcome, ${user.name}! 👋` : "What do you want to learn? 🌍"}
+          </h1>
+          <p className="text-gray-600 mt-1">Pick a language and start learning.</p>
         </div>
 
         <div className="relative mb-6">
