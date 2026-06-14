@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import { Input } from "@/components/ui/input";
 
 interface Language {
   id: string; code: string; name: string; nativeName: string; flag: string;
@@ -10,6 +11,7 @@ interface Language {
 
 export default function DashboardPage() {
   const [languages, setLanguages] = useState<Language[]>([]);
+  const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,13 +20,9 @@ export default function DashboardPage() {
       .then(data => { setLanguages(data); setLoading(false); });
   }, []);
 
-  if (loading) return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading...</div>
-      </div>
-    </div>
+  const filtered = languages.filter(l =>
+    l.name.toLowerCase().includes(query.toLowerCase()) ||
+    l.nativeName.toLowerCase().includes(query.toLowerCase())
   );
 
   return (
@@ -36,25 +34,50 @@ export default function DashboardPage() {
           <p className="text-gray-600 mt-1">Pick a language and start right away — no account needed.</p>
         </div>
 
-        <h2 className="text-lg font-semibold text-gray-700 mb-4">Choose a language</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {languages.map((lang) => (
-            <Link key={lang.code} href={`/learn/${lang.code}`}>
-              <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 cursor-pointer group">
-                <div className="text-4xl mb-3">{lang.flag}</div>
-                <div className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                  {lang.name}
-                </div>
-                <div className="text-sm text-gray-500 mt-0.5">{lang.nativeName}</div>
-                {lang.hasScript && (
-                  <div className="mt-2 inline-block text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full">
-                    ✍️ {lang.scriptName}
-                  </div>
-                )}
-              </div>
-            </Link>
-          ))}
+        <div className="relative mb-6">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+          <Input
+            placeholder="Search languages..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            className="pl-9 h-11 text-base bg-white"
+          />
         </div>
+
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 h-28 animate-pulse" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16 text-gray-500">
+            <div className="text-4xl mb-3">🔍</div>
+            <p className="font-medium">No languages found for &quot;{query}&quot;</p>
+          </div>
+        ) : (
+          <>
+            <p className="text-sm text-gray-500 mb-4">{filtered.length} language{filtered.length !== 1 ? "s" : ""}</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {filtered.map((lang) => (
+                <Link key={lang.code} href={`/learn/${lang.code}`}>
+                  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 cursor-pointer group">
+                    <div className="text-4xl mb-3">{lang.flag}</div>
+                    <div className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                      {lang.name}
+                    </div>
+                    <div className="text-sm text-gray-500 mt-0.5">{lang.nativeName}</div>
+                    {lang.hasScript && (
+                      <div className="mt-2 inline-block text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full">
+                        ✍️ {lang.scriptName}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
