@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { LANGUAGES } from "@/lib/languages";
 
+export const dynamic = "force-dynamic";
+
 export async function POST() {
   // Seed languages
   for (const lang of LANGUAGES) {
